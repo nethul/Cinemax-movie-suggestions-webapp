@@ -1,0 +1,5 @@
+{
+  "name": "Cinematch AI",
+  "description": "Get personalized movie recommendations based on your unique taste. Input your favorite films, and Cinematch AI's model analyzes the context, themes, and tones to suggest movies you'll love.",
+  "requestFramePermissions": []
+}
