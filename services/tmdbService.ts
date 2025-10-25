@@ -2,7 +2,7 @@ import { Movie } from '../types';
 
 // Use the environment variable for the TMDb API key, which is the secure and correct approach.
 // The execution environment is expected to provide this variable.
-const TMDB_API_KEY = 'd4359cb9f017bbb43673c0a46c1a9f23';
+const TMDB_API_KEY = "d4359cb9f017bbb43673c0a46c1a9f23";
 const API_BASE_URL = 'https://api.themoviedb.org/3';
 const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
 

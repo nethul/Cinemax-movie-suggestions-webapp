@@ -7,5 +7,6 @@ export interface Movie {
 export interface MovieRecommendation {
   title:string;
   reason: string;
+  match_reasons: string[];
   posterPath?: string | null;
 }

@@ -12,6 +12,12 @@ const FilmIcon: React.FC<{className: string}> = ({className}) => (
     </svg>
 );
 
+const ShareIcon: React.FC<{ className: string }> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+    </svg>
+);
+
 const initialMovies: Movie[] = [
     { id: 27205, title: 'Inception (2010)', posterPath: 'https://image.tmdb.org/t/p/w500/9gk7adHYeDvHkCK_RX5eDeZmo6B.jpg' },
     { id: 603, title: 'The Matrix (1999)', posterPath: 'https://image.tmdb.org/t/p/w500/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg' },
@@ -24,6 +30,7 @@ const App: React.FC = () => {
   const [recommendations, setRecommendations] = useState<MovieRecommendation[] | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [isCopied, setIsCopied] = useState<boolean>(false);
 
   const handleGetRecommendations = async () => {
     if (movies.length < 2) {
@@ -52,6 +59,35 @@ const App: React.FC = () => {
       setError(err instanceof Error ? err.message : "An unknown error occurred.");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleShare = async () => {
+    if (!recommendations) return;
+
+    const shareUrl = 'https://aistudio.google.com/'; // Using a valid, canonical URL
+    const movieTitles = recommendations.map(rec => `- ${rec.title}`).join('\n');
+    const shareText = `I got these AI-based movie recommendations from Cinematch AI:\n\n${movieTitles}\n\nWhat will you get?`;
+
+    const shareData = {
+        title: 'Cinematch AI Recommendations',
+        text: shareText,
+        url: shareUrl,
+    };
+
+    if (navigator.share) {
+        try {
+            await navigator.share(shareData);
+        } catch (err) {
+            // Don't log an error if the user cancels the share dialog
+            if (err.name !== 'AbortError') {
+                console.error("Share failed:", err);
+            }
+        }
+    } else {
+        navigator.clipboard.writeText(`${shareText}\n\nTry it yourself: ${shareUrl}`);
+        setIsCopied(true);
+        setTimeout(() => setIsCopied(false), 2500);
     }
   };
 
@@ -97,11 +133,24 @@ const App: React.FC = () => {
             )}
             
             {recommendations && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
-                {recommendations.map((rec, index) => (
-                  <MovieCard key={index} recommendation={rec} />
-                ))}
-              </div>
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
+                  {recommendations.map((rec, index) => (
+                    <MovieCard key={index} recommendation={rec} />
+                  ))}
+                </div>
+
+                <div className="text-center mt-10 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+                    <button
+                        onClick={handleShare}
+                        disabled={isCopied}
+                        className="bg-cyan-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-cyan-700 disabled:bg-green-500 disabled:cursor-default transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-cyan-500/30 mx-auto"
+                    >
+                        <ShareIcon className="w-5 h-5" />
+                        {isCopied ? 'Link Copied!' : 'Share Results'}
+                    </button>
+                </div>
+              </>
             )}
           </div>
         </main>
